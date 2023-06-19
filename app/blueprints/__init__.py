@@ -19,8 +19,10 @@ from flask import Blueprint, redirect
 
 from app.blueprints.account import blueprint_account
 from app.blueprints.errors import blueprint_errors
+from app.blueprints.forms import blueprint_forms
 from app.blueprints.languages import blueprint_languages
-
+from app.blueprints.registrations import blueprint_registrations
+from app.decorators.user_get import user_get
 
 blueprint_main = Blueprint(
     name='blueprint_account',
@@ -31,8 +33,10 @@ blueprint_main = Blueprint(
 blueprint_main.register_blueprint(blueprint=blueprint_errors)
 blueprint_main.register_blueprint(blueprint=blueprint_account)
 blueprint_main.register_blueprint(blueprint=blueprint_languages)
+blueprint_main.register_blueprint(blueprint=blueprint_registrations)
+blueprint_main.register_blueprint(blueprint=blueprint_forms)
 
 
 @blueprint_main.route('/', methods=['GET'])
 def main():
-    return redirect('/registrasion')
+    return redirect('/form')

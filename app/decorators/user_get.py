@@ -40,11 +40,10 @@ def user_get(not_return: bool = False):
                 adecty_api_client.account.get(account_session_token=account_session_token)
             except AdectyApiClientError:
                 return redirect(location=ACCOUNT_SESSION_TOKEN_GET_URL)
-
             account_id = adecty_api_client.account.get(account_session_token)['account_id']
             account = Account.get_or_none(Account.adecty_account_id == account_id)
             if not account:
-                return redirect('/registration')
+                return redirect('/registrations')
 
             if not not_return:
                 kwargs['account'] = account

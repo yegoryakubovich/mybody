@@ -46,11 +46,14 @@ class Language(BaseModel):
 
 class Account(BaseModel):
     id = PrimaryKeyField()
+    gender = CharField()
     adecty_account_id = IntegerField()
     language = ForeignKeyField(Language, to_field='id')
-
-
-
+    first_name = CharField()
+    last_name = CharField()
+    middle_name = CharField(null=True)
+    telegram = CharField()
+    timezone = CharField()
 
     def text_get(self, key):
         text = Text.get_or_none(Text.key == key)
