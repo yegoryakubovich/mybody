@@ -1,0 +1,5 @@
+config.ini
+/adecty_api_client
+/adecty_design
+/.idea
+*__pycache__
