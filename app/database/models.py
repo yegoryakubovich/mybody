@@ -158,4 +158,4 @@ class AccountParameter(BaseModel):
     datetime = DateTimeField()
 
     class Meta:
-        table_name = 'accounts_parameters'
+        db_table = 'accounts_parameters'

@@ -13,15 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import datetime
 
-from datetime import datetime
-
-from flask import Blueprint, request
+from flask import Blueprint, request, redirect
 from app.adecty_design.interface import interface
-from adecty_design.properties import Font
-from adecty_design.widgets import Text, InputText
-from app.database import Account, Parameter, AccountParameter
-from app.decorators.user_get import user_get
+from adecty_design.properties import Font, Margin
+from adecty_design.widgets import Text, InputText, Form, InputButton
+from app.database import Parameter, Translate, Account, AccountParameter
+
 
 blueprint_forms = Blueprint(
     name='blueprint_forms',
@@ -32,43 +31,51 @@ blueprint_forms = Blueprint(
 
 @blueprint_forms.route('/', methods=['GET', 'POST'])
 def form_create():
-    user_gender = Account.get().gender
-
-    if user_gender == 'мужчина':
-        query = Parameter.select().where((Parameter.is_gender == 'men') | (Parameter.is_gender.is_null()))
-    elif user_gender == 'женщина':
-        query = Parameter.select().where((Parameter.is_gender == 'female') | (Parameter.is_gender.is_null()))
-    else:
-        query = Parameter.select().where(Parameter.is_gender.is_null())
-
-    questions = [parameter.key_parameter for parameter in query]
-
-    widgets = []
-    for question in questions:
-        widgets.append(Text(
-            text=question,
-            font=Font(
-                size=14,
-                weight=700,
-            )
-        ))
-        widgets.append(InputText(id=question.lower().replace(' ', '_'), value=''))
-
+    account = Account.get()
+    parameters = Parameter.select()
     if request.method == 'POST':
-        account = Account.get()
-        for question in questions:
-            parameter = Parameter.get(Parameter.key_parameter == question)
-            value = request.form.get(question.lower().replace(' ', '_'))
-            AccountParameter.create(
-                account=account,
-                parameter=parameter,
-                value=value,
-                datetime=datetime.now()
-            )
+        for parameter in parameters:
+            text = parameter.text
+            translates = Translate.select().where(Translate.text == text)
 
-    interface_html = interface.html_get(
-        widgets=widgets,
-        active='registration',
-    )
+            for translate in translates:
+                input_id = f'new_text_value_{translate.id}'
+                new_text_value = request.form.get(input_id)
+                if new_text_value:
+                    account_parameter = AccountParameter.create(
+                        account=account,
+                        parameter=parameter,
+                        value=new_text_value,
+                        datetime=datetime.datetime.now(),
+                    )
+                    account_parameter.save()
+
+        return redirect('/ыавпвап')
+
+    form_widgets = []
+
+    for parameter in parameters:
+        text = parameter.text
+        translates = Translate.select().where(Translate.text == text)
+
+        for translate in translates:
+            if (
+                    (account.gender == 'men' and (parameter.is_gender is None or parameter.is_gender == 'men')) or
+                    (account.gender == 'female' and (parameter.is_gender is None or parameter.is_gender == 'female'))
+            ):
+                text_widget = Text(
+                    text=translate.value,
+                    font=Font(size=14, weight=400),
+                    margin=Margin(down=8),
+                )
+                input_text_widget = InputText(id=f'new_text_value_{translate.id}')
+
+                form_widgets.extend([text_widget, input_text_widget])
+
+    save_button_widget = InputButton(text='Сохранить', margin=Margin(top=8))
+    form_widgets.append(save_button_widget)
+
+    form = Form(widgets=form_widgets)
+    interface_html = interface.html_get(widgets=[form], active='categories')
 
     return interface_html

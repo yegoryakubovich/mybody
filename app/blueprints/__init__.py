@@ -22,7 +22,6 @@ from app.blueprints.errors import blueprint_errors
 from app.blueprints.forms import blueprint_forms
 from app.blueprints.languages import blueprint_languages
 from app.blueprints.registrations import blueprint_registrations
-from app.decorators.user_get import user_get
 
 blueprint_main = Blueprint(
     name='blueprint_account',
@@ -39,4 +38,4 @@ blueprint_main.register_blueprint(blueprint=blueprint_forms)
 
 @blueprint_main.route('/', methods=['GET'])
 def main():
-    return redirect('/form')
+    return redirect('/forms')
