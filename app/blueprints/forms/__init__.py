@@ -33,6 +33,8 @@ blueprint_forms = Blueprint(
 def form_create():
     account = Account.get()
     parameters = Parameter.select()
+    account_parameters = AccountParameter.select().where(AccountParameter.account == account)
+    account_parameter_ids = [ap.parameter.id for ap in account_parameters]
     if request.method == 'POST':
         for parameter in parameters:
             text = parameter.text
@@ -55,22 +57,24 @@ def form_create():
     form_widgets = []
 
     for parameter in parameters:
-        text = parameter.text
-        translates = Translate.select().where(Translate.text == text)
+        if parameter.id not in account_parameter_ids:
+            text = parameter.text
+            translates = Translate.select().where(Translate.text == text)
 
-        for translate in translates:
-            if (
-                    (account.gender == 'men' and (parameter.is_gender is None or parameter.is_gender == 'men')) or
-                    (account.gender == 'female' and (parameter.is_gender is None or parameter.is_gender == 'female'))
-            ):
-                text_widget = Text(
-                    text=translate.value,
-                    font=Font(size=14, weight=400),
-                    margin=Margin(down=8),
-                )
-                input_text_widget = InputText(id=f'new_text_value_{translate.id}')
+            for translate in translates:
+                if (
+                        (account.gender == 'men' and (parameter.is_gender is None or parameter.is_gender == 'men')) or
+                        (account.gender == 'female' and (
+                                parameter.is_gender is None or parameter.is_gender == 'female'))
+                ):
+                    text_widget = Text(
+                        text=translate.value,
+                        font=Font(size=14, weight=400),
+                        margin=Margin(down=8),
+                    )
+                    input_text_widget = InputText(id=f'new_text_value_{translate.id}')
 
-                form_widgets.extend([text_widget, input_text_widget])
+                    form_widgets.extend([text_widget, input_text_widget])
 
     save_button_widget = InputButton(text='Сохранить', margin=Margin(top=8))
     form_widgets.append(save_button_widget)
