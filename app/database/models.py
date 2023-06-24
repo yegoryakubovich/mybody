@@ -52,7 +52,7 @@ class Account(BaseModel):
     first_name = CharField()
     last_name = CharField()
     middle_name = CharField(null=True)
-    telegram = CharField()
+    telegram = CharField(null=True)
     timezone = CharField()
 
     def text_get(self, key):

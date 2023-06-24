@@ -19,9 +19,10 @@ import pytz
 from flask import Blueprint, request, redirect
 from app.adecty_design.interface import interface
 from adecty_design.properties import Font, Margin
-from adecty_design.widgets import Text, InputButton, InputSelect, InputText, Form
+from adecty_design.widgets import Text, InputButton, InputSelect, InputText, Form, ButtonType, Button
 from app.database import Account, Language
 from app.decorators.user_get import adecty_api_client
+
 
 blueprint_registrations = Blueprint(
     name='blueprint_registrations',
@@ -61,8 +62,11 @@ def questionary_get():
             gender=gender
         )
         account.save()
-        return redirect('/ыавпвап')
 
+        return redirect('/forms')
+
+    account_session_token = request.cookies.get('account_session_token')
+    adecty_account_id = adecty_api_client.account.get(account_session_token=account_session_token)['account_id']
     text = 'Для продолжения, пожалуйста, заполните анкету'
     options = ['Мужской', 'Женский']
     timezone_options = [timezone for timezone in timezones]
@@ -96,22 +100,18 @@ def questionary_get():
                     font=Font(size=14, weight=700),
                 ),
                 InputText(id='middle_name'),
-                Text(
-                    text='Telegram',
-                    font=Font(size=14, weight=700),
-                ),
-                InputText(id='telegram'),
-                Text(
-                    text='Часовой пояс',
-                    font=Font(size=14, weight=700),
-                ),
                 InputSelect(id='timezone', options=timezone_options),
                 Text(
                     text='Язык',
                     font=Font(size=14, weight=700),
                 ),
                 InputSelect(id='language_name', options=language_options),
-                InputButton(text='Далее', margin=Margin(top=8)),
+                Button(
+                    type=ButtonType.chip,
+                    text='Привязка к Telegram',
+                    url=f"https://t.me/mbd_bot?start={adecty_account_id}",
+                ),
+                InputButton(text='Сохранить', margin=Margin(top=8)),
             ],
         ),
     ]

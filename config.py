@@ -23,6 +23,7 @@ config.read('config.ini', encoding='utf-8')
 config_mysql = config['mysql']
 config_urls = config['urls']
 config_settings = config['settings']
+config_aiogram = config['aiogram']
 
 MYSQL_HOST = config_mysql.get('host')
 MYSQL_PORT = config_mysql.getint('port')
@@ -35,3 +36,5 @@ URL_APP_ADMIN = config_urls.get('app_admin')
 
 SETTINGS_KEY = config_settings['key']
 SETTINGS_TEXT_404 = config_settings['text_404']
+
+TELEGRAM_BOT_TOKEN = config_aiogram['token']

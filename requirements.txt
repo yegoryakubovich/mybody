@@ -2,3 +2,4 @@ flask
 peewee
 pymysql
 pytz
+aiogram

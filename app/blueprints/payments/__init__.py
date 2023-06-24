@@ -13,23 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import threading
-
-from flask import Flask
-from app.blueprints import blueprint_main
-from app.database import tables_create
-from app.flask import before_request, teardown_request
-from app.functions.telegram_bot import run_bot
-from config import SETTINGS_KEY
 
 
-def app_create():
-    tables_create()
-    app = Flask(import_name=__name__)
-    app.secret_key = SETTINGS_KEY
-    app.before_request(f=before_request)
-    app.teardown_request(f=teardown_request)
-    app.register_blueprint(blueprint=blueprint_main)
-    bot_thread = threading.Thread(target=run_bot)
-    bot_thread.start()
-    return app
+from flask import Blueprint
+
+blueprint_payments = Blueprint(
+    name='blueprint_payments',
+    import_name=__name__,
+    url_prefix='/payments'
+)
+
