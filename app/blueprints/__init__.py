@@ -22,6 +22,7 @@ from app.blueprints.errors import blueprint_errors
 from app.blueprints.forms import blueprint_forms
 from app.blueprints.payments import blueprint_payments
 from app.blueprints.registrations import blueprint_registrations
+from app.blueprints.registrations_tg_bot import blueprint_registrations_tg_bot
 from app.database import Account
 from app.decorators.user_get import user_get
 
@@ -36,6 +37,7 @@ blueprint_main.register_blueprint(blueprint=blueprint_account)
 blueprint_main.register_blueprint(blueprint=blueprint_registrations)
 blueprint_main.register_blueprint(blueprint=blueprint_forms)
 blueprint_main.register_blueprint(blueprint=blueprint_payments)
+blueprint_main.register_blueprint(blueprint=blueprint_registrations_tg_bot)
 
 
 @blueprint_main.route('/', methods=['GET'])

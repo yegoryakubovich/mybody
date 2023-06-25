@@ -20,4 +20,4 @@ from app import app_create
 
 if __name__ == '__main__':
     app = app_create()
-    app.run(host='0.0.0.0', port=80, debug=True)
+    app.run(host='0.0.0.0', port=80)

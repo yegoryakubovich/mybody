@@ -16,10 +16,11 @@
 
 
 import pytz
+from adecty_design.widgets.required import Navigation
 from flask import Blueprint, request, redirect
 from app.adecty_design.interface import interface
 from adecty_design.properties import Font, Margin
-from adecty_design.widgets import Text, InputButton, InputSelect, InputText, Form, ButtonType, Button
+from adecty_design.widgets import Text, InputButton, InputSelect, InputText, Form
 from app.database import Account, Language
 from app.decorators.user_get import adecty_api_client
 
@@ -38,7 +39,6 @@ def questionary_get():
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
         middle_name = request.form.get('middle_name')
-        telegram = request.form.get('telegram')
         timezone = request.form.get('timezone')
         gender = request.form.get('gender')
         language_name = request.form.get('language_name')
@@ -57,16 +57,13 @@ def questionary_get():
             first_name=first_name,
             last_name=last_name,
             middle_name=middle_name,
-            telegram=telegram,
             timezone=timezone,
             gender=gender
         )
         account.save()
 
-        return redirect('/forms')
+        return redirect('/registrations_tg_bot')
 
-    account_session_token = request.cookies.get('account_session_token')
-    adecty_account_id = adecty_api_client.account.get(account_session_token=account_session_token)['account_id']
     text = 'Для продолжения, пожалуйста, заполните анкету'
     options = ['Мужской', 'Женский']
     timezone_options = [timezone for timezone in timezones]
@@ -106,18 +103,16 @@ def questionary_get():
                     font=Font(size=14, weight=700),
                 ),
                 InputSelect(id='language_name', options=language_options),
-                Button(
-                    type=ButtonType.chip,
-                    text='Привязка к Telegram',
-                    url=f"https://t.me/mbd_bot?start={adecty_account_id}",
-                ),
-                InputButton(text='Сохранить', margin=Margin(top=8)),
+                InputButton(text='Далее', margin=Margin(top=8)),
             ],
         ),
     ]
+    navigation_none = Navigation(
+        items=[],
+    )
     interface_html = interface.html_get(
         widgets=widgets,
-        active='registration',
+        navigation=navigation_none
     )
 
     return interface_html
