@@ -46,12 +46,12 @@ class Language(BaseModel):
 
 class Account(BaseModel):
     id = PrimaryKeyField()
-    gender = CharField()
     adecty_account_id = IntegerField()
     language = ForeignKeyField(Language, to_field='id')
     first_name = CharField()
     last_name = CharField()
     middle_name = CharField(null=True)
+    gender = CharField()
     telegram = CharField(null=True)
     timezone = CharField()
 
