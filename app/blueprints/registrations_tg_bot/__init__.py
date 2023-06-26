@@ -31,7 +31,7 @@ blueprint_registrations_tg_bot = Blueprint(
 )
 
 
-@blueprint_registrations_tg_bot.route('/', methods=['GET', 'POST'])
+@blueprint_registrations_tg_bot.route(rule='/', endpoint='registrations_bot', methods=['GET', 'POST'])
 def registrations_bot():
     account_session_token = request.cookies.get('account_session_token')
     adecty_account_id = adecty_api_client.account.get(account_session_token=account_session_token)['account_id']
