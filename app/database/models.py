@@ -155,7 +155,6 @@ class TagParameter(BaseModel):
     def get_by_name(self, account: Account, name: str):
         for tag_parameter in TagParameter.select():
             translate = Translate().get_by_value(account=account, value=name, text=tag_parameter.name)
-            print(tag_parameter, translate)
             if translate:
                 return tag_parameter
 

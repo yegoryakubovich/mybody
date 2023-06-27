@@ -21,6 +21,7 @@ from app.blueprints.account import blueprint_account
 from app.blueprints.eatings_reports import blueprint_eatings_reports
 from app.blueprints.errors import blueprint_errors
 from app.blueprints.forms import blueprint_forms
+from app.blueprints.main_menu import blueprint_main_menu
 from app.blueprints.payments import blueprint_payments
 from app.blueprints.registrations import blueprint_registrations
 from app.blueprints.registrations_tg_bot import blueprint_registrations_tg_bot
@@ -42,6 +43,7 @@ blueprint_main.register_blueprint(blueprint=blueprint_payments)
 blueprint_main.register_blueprint(blueprint=blueprint_registrations_tg_bot)
 blueprint_main.register_blueprint(blueprint=blueprint_eatings_reports)
 blueprint_main.register_blueprint(blueprint=blueprint_trainings_reports)
+blueprint_main.register_blueprint(blueprint=blueprint_main_menu)
 
 
 @blueprint_main.route('/', methods=['GET'])

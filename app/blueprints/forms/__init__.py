@@ -15,12 +15,12 @@
 #
 import datetime
 
-from flask import Blueprint, request, redirect
+
+from flask import Blueprint, request, redirect, url_for
 from app.adecty_design.interface import interface
 from adecty_design.properties import Font, Margin
 from adecty_design.widgets import Text, InputText, Form, InputButton
-from app.database import Parameter, Translate, Account, AccountParameter
-
+from app.database import Parameter, Translate, Account, AccountParameter, TagParameter
 
 blueprint_forms = Blueprint(
     name='blueprint_forms',
@@ -29,10 +29,10 @@ blueprint_forms = Blueprint(
 )
 
 
-@blueprint_forms.route('/', methods=['GET', 'POST'])
+@blueprint_forms.route('/', endpoint='create', methods=['GET', 'POST'])
 def form_create():
     account = Account.get()
-    parameters = Parameter.select()
+    parameters = Parameter.select().join(TagParameter).order_by(TagParameter.id)
     account_parameters = AccountParameter.select().where(AccountParameter.account == account)
     account_parameter_ids = [ap.parameter.id for ap in account_parameters]
     if request.method == 'POST':
@@ -52,12 +52,39 @@ def form_create():
                     )
                     account_parameter.save()
 
-        return redirect('/ыавпвап')
+        unanswered_parameters = [p for p in parameters if p.id not in account_parameter_ids]
+        if unanswered_parameters:
+            next_tag_id = unanswered_parameters[0].tag.id
+            return redirect(url_for('blueprint_account.blueprint_forms.create', tag_id=next_tag_id))
+        else:
+            return redirect('/ыавпвап')
 
+    tag_id = request.args.get('tag_id', None)
     form_widgets = []
+    current_tag = None
+    is_next_tag = False
+
+    heading_widget = Text(
+        text='Ответьте на несколько вопросов',
+        font=Font(size=18, weight=600),
+        margin=Margin(down=16),
+    )
+    form_widgets.append(heading_widget)
 
     for parameter in parameters:
         if parameter.id not in account_parameter_ids:
+            tag_parameter = parameter.tag
+            if current_tag is None:
+                current_tag = tag_parameter
+            if tag_parameter != current_tag:
+                if is_next_tag:
+                    break
+
+                current_tag = tag_parameter
+
+            if tag_id and current_tag.id != int(tag_id):
+                continue
+
             text = parameter.text
             translates = Translate.select().where(Translate.text == text)
 
@@ -76,10 +103,13 @@ def form_create():
 
                     form_widgets.extend([text_widget, input_text_widget])
 
-    save_button_widget = InputButton(text='Сохранить', margin=Margin(top=8))
+            if not is_next_tag and current_tag == tag_parameter:
+                is_next_tag = True
+
+    save_button_widget = InputButton(text='Далее', margin=Margin(top=8))
     form_widgets.append(save_button_widget)
 
     form = Form(widgets=form_widgets)
-    interface_html = interface.html_get(widgets=[form], active='categories')
+    interface_html = interface.html_get(widgets=[form])
 
     return interface_html
