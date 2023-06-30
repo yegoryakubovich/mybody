@@ -22,15 +22,15 @@ from app.functions.icon_get import icon_get
 navigation_main = Navigation(
     items=[
         NavigationItem(
-            id='registrations',
-            name='Регистрация',
-            url='/registrations',
+            id='articles',
+            name='Статьи',
+            url='/articles',
             icon=icon_get(filename='items.svg'),
         ),
         NavigationItem(
-            id='forms',
-            name='Анкета',
-            url='/forms',
+            id='eating_reports',
+            name='Отчет пищи',
+            url='/eating_reports',
             icon=icon_get(filename='items.svg'),
         ),
     ],

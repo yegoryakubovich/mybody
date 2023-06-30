@@ -21,9 +21,9 @@ from adecty_design.properties import Margin, Font
 from adecty_design.widgets import Text,  InputText, InputButton, Form
 from flask import Blueprint, request
 from app.adecty_design.interface import interface
-from app.database.models import EatingReport, Account
+from app.database.models import ReportEating, Account
 from app.decorators.admin_get import adecty_api_client
-
+from app.decorators.user_get import user_get
 
 blueprint_trainings_reports = Blueprint(
     name='blueprint_trainings_reports',
@@ -33,6 +33,7 @@ blueprint_trainings_reports = Blueprint(
 
 
 @blueprint_trainings_reports.route(rule='/', endpoint='eating_reports', methods=['GET', 'POST'])
+@user_get()
 def eating_reports():
     if request.method == 'POST':
         value = request.form.get('value')
@@ -40,7 +41,7 @@ def eating_reports():
         account_session_token = request.cookies.get('account_session_token')
         adecty_account_id = adecty_api_client.account.get(account_session_token=account_session_token)['account_id']
         account = Account.get(Account.adecty_account_id == adecty_account_id)
-        eating_report = EatingReport(
+        eating_report = ReportEating(
             account=account.id,
             value=value,
             datetime=datetime.now()
