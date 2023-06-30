@@ -22,8 +22,7 @@ from app.adecty_design.interface import interface
 from adecty_design.properties import Font, Margin
 from adecty_design.widgets import Text, InputButton, InputSelect, InputText, Form
 from app.database import Account, Language
-from app.decorators.user_get import adecty_api_client
-
+from app.decorators.user_get import adecty_api_client, user_get
 
 blueprint_registrations = Blueprint(
     name='blueprint_registrations',
@@ -33,6 +32,7 @@ blueprint_registrations = Blueprint(
 
 
 @blueprint_registrations.route(rule='/', endpoint='get', methods=['GET', 'POST'])
+@user_get(not_return=True)
 def questionary_get():
     timezones = pytz.all_timezones
     if request.method == 'POST':

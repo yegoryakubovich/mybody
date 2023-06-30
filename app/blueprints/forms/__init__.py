@@ -21,6 +21,7 @@ from app.adecty_design.interface import interface
 from adecty_design.properties import Font, Margin
 from adecty_design.widgets import Text, InputText, Form, InputButton
 from app.database import Parameter, Translate, Account, AccountParameter, TagParameter
+from app.decorators.user_get import user_get
 
 blueprint_forms = Blueprint(
     name='blueprint_forms',
@@ -29,7 +30,11 @@ blueprint_forms = Blueprint(
 )
 
 
+# Тут дублируеться переход по одной и тому же тегу, не знаю как исправить, может вообще не так делал
+
+
 @blueprint_forms.route('/', endpoint='create', methods=['GET', 'POST'])
+@user_get(not_return=True)
 def form_create():
     account = Account.get()
     parameters = Parameter.select().join(TagParameter).order_by(TagParameter.id)

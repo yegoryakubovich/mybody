@@ -25,7 +25,7 @@ from flask import Blueprint, request, current_app
 from werkzeug.utils import secure_filename
 
 from app.adecty_design.interface import interface
-from app.database.models import EatingReport, Account
+from app.database.models import ReportEating, Account
 from app.decorators.admin_get import adecty_api_client
 
 blueprint_eatings_reports = Blueprint(
@@ -36,7 +36,7 @@ blueprint_eatings_reports = Blueprint(
 
 UPLOAD_FOLDER = 'static/eating_reports'
 
-
+# Сохранение фото не знаю как осуществляться будет, по этому пока написано так
 @blueprint_eatings_reports.route(rule='/', endpoint='eating_reports', methods=['GET', 'POST'])
 def eating_reports():
     if request.method == 'POST':
@@ -58,7 +58,7 @@ def eating_reports():
         account_session_token = request.cookies.get('account_session_token')
         adecty_account_id = adecty_api_client.account.get(account_session_token=account_session_token)['account_id']
         account = Account.get(Account.adecty_account_id == adecty_account_id)
-        eating_report = EatingReport(
+        eating_report = ReportEating(
             account=account.id,
             value=value,
             datetime=datetime.now()

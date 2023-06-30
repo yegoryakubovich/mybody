@@ -16,7 +16,7 @@
 
 
 from peewee import Model, PrimaryKeyField, MySQLDatabase, IntegerField, ForeignKeyField, CharField, BigIntegerField, \
-    DateTimeField
+    DateTimeField, BooleanField
 
 from config import MYSQL_NAME, MYSQL_USER, MYSQL_PASSWORD, MYSQL_HOST, MYSQL_PORT, SETTINGS_TEXT_404
 
@@ -132,9 +132,22 @@ class Item(BaseModel):
 class Article(BaseModel):
     id = PrimaryKeyField()
     name = ForeignKeyField(Text, to_field='id')
+    status = BooleanField(default=False)
+
+    def article_name_get(self, account: Account):
+        translate = Translate.get_or_none((Translate.language == account.language) & (Translate.text == self.name))
+        if not translate:
+            translate = Translate.get(Translate.text == self.name)
+        return translate.value
+
+    def get_by_aricle(self, account: Account, name: str):
+        for name_article in Article.select():
+            translate = Translate().get_by_value(account=account, value=name, text=name_article.name)
+            if translate:
+                return name_article
 
     class Meta:
-        db_table = 'articles'
+        db_table = 'article'
 
 
 class ArticleItem(BaseModel):
@@ -186,25 +199,97 @@ class AccountParameter(BaseModel):
     value = CharField(max_length=1024)
     datetime = DateTimeField()
 
+    def value_get(self, account: Account):
+        parameter_text = self.parameter.text
+        translate = Translate.get_or_none(
+            (Translate.language == account.language) & (Translate.text == parameter_text))
+        if not translate:
+            translate = Translate.get(Translate.text == parameter_text)
+        return translate.value
+
     class Meta:
         db_table = 'accounts_parameters'
 
 
-class EatingReport(BaseModel):
+class ReportEating(BaseModel):
     id = PrimaryKeyField()
     account = ForeignKeyField(Account, to_field='id')
     value = CharField(max_length=1024)
     datetime = DateTimeField()
 
     class Meta:
-        db_table = 'eatings_reports'
+        db_table = 'report_seatings'
 
 
-class TrainingReport(BaseModel):
+class ReportTraining(BaseModel):
     id = PrimaryKeyField()
     account = ForeignKeyField(Account, to_field='id')
     value = CharField(max_length=1024)
     datetime = DateTimeField()
 
     class Meta:
-        db_table = 'trainings_reports'
+        db_table = 'reports_trainings'
+
+
+class OrderTraining(BaseModel):
+    id = PrimaryKeyField()
+    account = ForeignKeyField(Account, to_field='id')
+    name = CharField()
+    unit = CharField()
+    article = ForeignKeyField(Article, to_field='id')
+
+    class Meta:
+        db_table = 'orders_trainings'
+
+
+class TimeFood(BaseModel):
+    id = PrimaryKeyField()
+    name = ForeignKeyField(Text, to_field='id')
+
+    def food_name_get(self, account: Account):
+        translate = Translate.get_or_none((Translate.language == account.language) & (Translate.text == self.name))
+        if not translate:
+            translate = Translate.get(Translate.text == self.name)
+        return translate.value
+
+    def get_by_food(self, account: Account, name: str):
+        for time_food in TimeFood.select():
+            translate = Translate().get_by_value(account=account, value=name, text=time_food.name)
+            if translate:
+                return time_food
+
+    class Meta:
+        db_table = 'times_foods'
+
+
+class Product(BaseModel):
+    id = PrimaryKeyField()
+    name = ForeignKeyField(Text, to_field='id')
+    article = ForeignKeyField(Article, to_field='id')
+
+    def product_name_get(self, account: Account):
+        translate = Translate.get_or_none((Translate.language == account.language) & (Translate.text == self.name))
+        if not translate:
+            translate = Translate.get(Translate.text == self.name)
+        return translate.value
+
+    def get_by_product(self, account: Account, name: str):
+        for product in Product.select():
+            translate = Translate().get_by_value(account=account, value=name, text=product.name)
+            if translate:
+                return product
+
+    class Meta:
+        db_table = 'products'
+
+
+class OrderEating(BaseModel):
+    id = PrimaryKeyField()
+    account = ForeignKeyField(Account, to_field='id')
+    time_food = ForeignKeyField(TimeFood, to_field='id')
+    name = ForeignKeyField(Product, to_field='id')
+    unit = CharField()
+    datetime = DateTimeField()
+
+    class Meta:
+        db_table = 'orders_eatings'
