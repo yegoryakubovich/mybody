@@ -13,31 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import datetime
+
+from flask import Blueprint, request, redirect
+from app.adecty_design.interface import interface
+from adecty_design.properties import Font, Margin
+from adecty_design.widgets import Text, InputText, Form, InputButton
+from app.database import Parameter, Translate, Account, AccountParameter
 
 
-from app.database.db_manager import db_manager
-from app.database.models import db, Admin, Language, Text, Translate, Account, Item, Article, ArticleItem, Parameter, \
-    AccountParameter, TagParameter, EatingReport, TrainingReport
+blueprint_main_menu = Blueprint(
+    name='blueprint_main_menu',
+    import_name=__name__,
+    url_prefix='/menu'
+)
 
-models = [
-    Language,
-    Account,
-    Admin,
-    Text,
-    Translate,
-    Item,
-    TagParameter,
-    Article,
-    ArticleItem,
-    Parameter,
-    AccountParameter,
-    EatingReport,
-    TrainingReport
-]
-
-
-@db_manager
-def tables_create():
-    db.create_tables(
-        models=models,
-    )
+"""@blueprint_main_menu.route(rule='/', endpoint='menu', methods=['GET', 'POST'])
+def menu():"""

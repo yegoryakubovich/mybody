@@ -48,9 +48,12 @@ class Account(BaseModel):
     id = PrimaryKeyField()
     adecty_account_id = IntegerField()
     language = ForeignKeyField(Language, to_field='id')
-
-
-
+    first_name = CharField()
+    last_name = CharField()
+    middle_name = CharField(null=True)
+    gender = CharField()
+    telegram = CharField(null=True)
+    timezone = CharField()
 
     def text_get(self, key):
         text = Text.get_or_none(Text.key == key)
@@ -101,9 +104,17 @@ class Text(BaseModel):
 
 class Translate(BaseModel):
     id = PrimaryKeyField()
-    language = ForeignKeyField(Language, backref='translates')
-    text = ForeignKeyField(Text, backref='translates')
+    language = ForeignKeyField(Language, to_field='id')
+    text = ForeignKeyField(Text, to_field='id')
     value = CharField()
+
+    def get_by_value(self, account: Account, value: str, text: Text):
+        translate = Translate.get_or_none((Translate.value == value) & (Translate.language == account.language) &
+                                          (Translate.text == text))
+
+        if not translate:
+            translate = Translate.get_or_none((Translate.value == value) & (Translate.text == text))
+        return translate
 
     class Meta:
         db_table = 'translates'
@@ -137,9 +148,30 @@ class ArticleItem(BaseModel):
         db_table = 'articles_items'
 
 
+class TagParameter(BaseModel):
+    id = PrimaryKeyField()
+    name = ForeignKeyField(Text, to_field='id', on_delete='cascade')
+
+    def get_by_name(self, account: Account, name: str):
+        for tag_parameter in TagParameter.select():
+            translate = Translate().get_by_value(account=account, value=name, text=tag_parameter.name)
+            if translate:
+                return tag_parameter
+
+    def name_get(self, account: Account):
+        translate = Translate.get_or_none((Translate.language == account.language) & (Translate.text == self.name))
+        if not translate:
+            translate = Translate.get(Translate.text == self.name)
+        return translate.value
+
+    class Meta:
+        db_table = 'tags_parameters'
+
+
 class Parameter(BaseModel):
     id = PrimaryKeyField()
     key_parameter = CharField(max_length=128)
+    tag = ForeignKeyField(TagParameter, to_field='id')
     text = ForeignKeyField(Text, to_field='id')
     is_gender = CharField(null=True)
 
@@ -150,9 +182,29 @@ class Parameter(BaseModel):
 class AccountParameter(BaseModel):
     id = PrimaryKeyField()
     account = ForeignKeyField(Account, to_field='id')
-    parameter = ForeignKeyField(Parameter, to_field='id')
+    parameter = ForeignKeyField(Parameter, to_field='id', on_delete='cascade')
     value = CharField(max_length=1024)
     datetime = DateTimeField()
 
     class Meta:
-        table_name = 'accounts_parameters'
+        db_table = 'accounts_parameters'
+
+
+class EatingReport(BaseModel):
+    id = PrimaryKeyField()
+    account = ForeignKeyField(Account, to_field='id')
+    value = CharField(max_length=1024)
+    datetime = DateTimeField()
+
+    class Meta:
+        db_table = 'eatings_reports'
+
+
+class TrainingReport(BaseModel):
+    id = PrimaryKeyField()
+    account = ForeignKeyField(Account, to_field='id')
+    value = CharField(max_length=1024)
+    datetime = DateTimeField()
+
+    class Meta:
+        db_table = 'trainings_reports'

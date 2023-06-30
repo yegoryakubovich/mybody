@@ -32,7 +32,6 @@ MYSQL_NAME = config_mysql.get('name')
 
 URL_APP = config_urls.get('app')
 URL_APP_ADMIN = config_urls.get('app_admin')
-URL_APP_USER = config_urls.get('app_user')
 
 SETTINGS_KEY = config_settings['key']
 SETTINGS_TEXT_404 = config_settings['text_404']

@@ -15,29 +15,11 @@
 #
 
 
-from app.database.db_manager import db_manager
-from app.database.models import db, Admin, Language, Text, Translate, Account, Item, Article, ArticleItem, Parameter, \
-    AccountParameter, TagParameter, EatingReport, TrainingReport
+from flask import Blueprint
 
-models = [
-    Language,
-    Account,
-    Admin,
-    Text,
-    Translate,
-    Item,
-    TagParameter,
-    Article,
-    ArticleItem,
-    Parameter,
-    AccountParameter,
-    EatingReport,
-    TrainingReport
-]
+blueprint_payments = Blueprint(
+    name='blueprint_payments',
+    import_name=__name__,
+    url_prefix='/payments'
+)
 
-
-@db_manager
-def tables_create():
-    db.create_tables(
-        models=models,
-    )

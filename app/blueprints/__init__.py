@@ -18,9 +18,16 @@
 from flask import Blueprint, redirect
 
 from app.blueprints.account import blueprint_account
+from app.blueprints.eatings_reports import blueprint_eatings_reports
 from app.blueprints.errors import blueprint_errors
-from app.blueprints.languages import blueprint_languages
-
+from app.blueprints.forms import blueprint_forms
+from app.blueprints.main_menu import blueprint_main_menu
+from app.blueprints.payments import blueprint_payments
+from app.blueprints.registrations import blueprint_registrations
+from app.blueprints.registrations_tg_bot import blueprint_registrations_tg_bot
+from app.blueprints.trainings_reports import blueprint_trainings_reports
+from app.database import Account
+from app.decorators.user_get import user_get
 
 blueprint_main = Blueprint(
     name='blueprint_account',
@@ -30,9 +37,16 @@ blueprint_main = Blueprint(
 
 blueprint_main.register_blueprint(blueprint=blueprint_errors)
 blueprint_main.register_blueprint(blueprint=blueprint_account)
-blueprint_main.register_blueprint(blueprint=blueprint_languages)
+blueprint_main.register_blueprint(blueprint=blueprint_registrations)
+blueprint_main.register_blueprint(blueprint=blueprint_forms)
+blueprint_main.register_blueprint(blueprint=blueprint_payments)
+blueprint_main.register_blueprint(blueprint=blueprint_registrations_tg_bot)
+blueprint_main.register_blueprint(blueprint=blueprint_eatings_reports)
+blueprint_main.register_blueprint(blueprint=blueprint_trainings_reports)
+blueprint_main.register_blueprint(blueprint=blueprint_main_menu)
 
 
 @blueprint_main.route('/', methods=['GET'])
-def main():
-    return redirect('/registrasion')
+@user_get()
+def main(account: Account):
+    return redirect('/registrations')
